@@ -133,7 +133,7 @@ function run_in_dom(file, func)
 function get_files_paths_from_dir(dir) {
 	files = fs.readdirSync(dir);
 	files = files.filter(function(path){return path != jquery}, files);
-	files = files.filter(function(path){return path != 'guide.html'}, files);
+	files = files.filter(function(path){return path != guidefile}, files);
 	return files.map(function(path){return dir + '/' + path}, files);
 }
 
@@ -152,7 +152,8 @@ function write_collected_list_of_quotes(guide, filesdir) {
 }
 
 var jquery = 'jquery.js';
-filesdir = 'files_to_highlight';
-guide = filesdir + '/guide.html';
+filesdir = 'examples';
+guidefile = 'Example_highlight_guide.html'
+guide = filesdir + '/' + guidefile;
 
 write_collected_list_of_quotes(guide, filesdir);
