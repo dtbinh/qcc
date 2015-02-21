@@ -3,11 +3,12 @@ var path = require('path');
 var jsdom = require('jsdom');
 var context = [];
 
-function make_string_id_ready(str)
+function djb2(str)
 {
-	str = str.replace(/[ ->]/g, '');
-	str = str.toLowerCase();
-	return str;
+	var out = 5381;
+	return str.split('').reduce(function(p, c){
+		return ((p << 5) + p) + c.charCodeAt(0)
+	}, out);
 }
 
 function create_html_from_filepaths(filepath)
@@ -18,7 +19,7 @@ function create_html_from_filepaths(filepath)
 
 function create_html_from_category(cat)
 {
-	var header = '<h1 id="' + make_string_id_ready(cat) + '">'+cat+'</h1>';
+	var header = '<h1 id="' + djb2(cat) + '">'+cat+'</h1>';
 	var out = cat.map(function(x) {return create_html_from_filepaths(x) + '<h2>' + filepath + '</h2>'});
 	return out.reduce(function(p, q) {return p + q}, header);
 }
@@ -50,7 +51,7 @@ function add_quote_if_not_yet_in_category()
 		colorcode = self.css('background-color');
 		if (cat = categories[colorcode]) {
 			if (cat != category) {
-				self.html(self.html().link('#' + make_string_id_ready(cat)));
+				self.html(self.html().link('#' + djb2(cat)));
 			}
 		}
 	});
