@@ -1,7 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var jsdom = require('jsdom');
-var context = [];
+var context = {};
 
 function djb2(str)
 {
@@ -13,20 +13,21 @@ function djb2(str)
 
 function create_html_from_filepaths(filepath)
 {
-	var out = filepath.map(function(x) {return x + '<br><br>'});
-	return out.reduce(function(p, q) {return p + q});
+	var out = Object.keys(filepath).map(function(k) {return filepath[k] + '<br><br>'});
+	return out.reduce(function(p, q) {return p + q}, '');
 }
 
-function create_html_from_category(cat)
+function create_html_from_category(category)
 {
-	var header = '<h1 id="' + djb2(cat) + '">'+cat+'</h1>';
-	var out = cat.map(function(x) {return create_html_from_filepaths(x) + '<h2>' + filepath + '</h2>'});
-	return out.reduce(function(p, q) {return p + q}, header);
+	var out = Object.keys(category).map(function(k) {return '<h2>' + k + '</h2>' + create_html_from_filepaths(category[k])});
+	return out.reduce(function(p, q) {return p + q}, '');
 }
 
 function create_html_from_context()
 {
-	out = context.map(function(x) {create_html_from_category(x)});
+	out = Object.keys(context).map(function(k) {
+		return '<h1 id=' + djb2(k) + '>' + k + '</h1>' + create_html_from_category(context[k])}
+	);
 	return out.reduce(function(p, q) {return p + q}, '');
 }
 
@@ -37,14 +38,15 @@ function set_inline_background_color() {
 function add_file_path_if_not_yet_in_category()
 {
 	if (typeof(context[category][filepath]) == 'undefined') {
-		context[category][filepath] = [];
+		context[category][filepath] = {};
 	}
 }
 
 function add_quote_if_not_yet_in_category()
 {
 	quoteblock = self.parent();
-	quote_text = quoteblock.text();
+	quote_html = quoteblock.html();
+	quote_identifier = djb2(quote_html);
 	highlighted = $('span[class^=c]', quoteblock);
 	highlighted.each(function(){
 		self = $(this);
@@ -55,16 +57,14 @@ function add_quote_if_not_yet_in_category()
 			}
 		}
 	});
-	quote_html = quoteblock.html();
 
-
-	context[category][filepath][quote_text] = quote_html;
+	context[category][filepath][quote_identifier] = quote_html;
 }
 
 function add_category_if_not_yet_in_context()
 {
 	if (typeof(context[category]) == 'undefined') {
-		context[category] = [];
+		context[category] = {};
 	}
 }
 
