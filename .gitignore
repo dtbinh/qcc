@@ -1,0 +1,4 @@
+*.txt
+*.html
+node_modules
+files_to_highlight/*
