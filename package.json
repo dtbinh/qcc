@@ -14,8 +14,11 @@
     "url": "https://github.com/vdloo/qcc.js.git"
   },
   "dependencies": {
+	  "argparse": "latest",
+	  "urllib-sync": "latest",
 	  "jsdom": "latest",
-	  "argparse": "latest"
+	  "url": "latest",
+	  "googleapis": "latest"
   },
   "keywords": [
     "qualitative",

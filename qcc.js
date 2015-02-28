@@ -1,19 +1,21 @@
 #!/usr/bin/env node
 var fs = require('fs');
 var path = require('path');
-var jsdom = require('jsdom');
 var argparse = require('argparse');
+var google = require('googleapis');
+var jsdom = require('jsdom');
 var jquery = path.resolve('jquery.js');
 
 var parser = new argparse.ArgumentParser({
 	version: '0.0.1',
 	addHelp: true,
-	description: 'Qualitative coding collector: a qualitative data analysis tool'
+	description: 'Qualitative coding collector: a qualitative data analysis tool',
+	epilog: 'Example: ./qcc.js -g examples/guide.html -d examples/transcripts/'
 });
 parser.addArgument(
 	['-g', '--guide'],
 	{
-		help: 'HTML file with highlighted list of terms',
+		help: 'HTML file with highlighted list of terms or Google Drive fileId',
 		required: true
 	}
 );
@@ -22,6 +24,30 @@ parser.addArgument(
 	{
 		help: 'directory containing HTML files with highlighted text',
 		required: true
+	}
+);
+parser.addArgument(
+	['-i', '--google-client-id'],
+	{
+		help: 'Client ID found in your Google Developer Console'
+	}
+);
+parser.addArgument(
+	['-s', '--google-client-secret'],
+	{
+		help: 'Client secret found in your Google Developer Console'
+	}
+);
+parser.addArgument(
+	['-a', '--google-client-access'],
+	{
+		help: 'Access token retrieved from oauth2Client.getToken (run generate-google-auth-url.js)'
+	}
+);
+parser.addArgument(
+	['-r', '--google-client-refresh'],
+	{
+		help: 'Refresh token retrieved from oauth2Client.getToken (run generate-google-auth-url.js)'
 	}
 );
 parser.addArgument(
@@ -159,25 +185,51 @@ function run_in_dom(file, func)
 	});
 }
 
-function get_files_paths_from_dir(dir) {
+function get_files_paths_from_dir(dir) 
+{
 	files = fs.readdirSync(dir);
 	files = files.filter(function(path){return path != jquery}, files);
 	return files.map(function(path){return dir + '/' + path}, files);
 }
 
 
-function write_output(out) {
+function write_output(out) 
+{
 	html = '<!DOCTYPE html><html lang="en"><head><title>qualitative coding collector</title></head><body>';
 	html += out;
 	html += '</body></html>';
 	fs.writeFile('out.html', html);
 }
 
-function write_collected_list_of_quotes(guide, filesdir) {
+function get_html_from_google_drive(guide) 
+{
+	if (!G_ID || !G_SECRET || !G_ACCESS || !G_REFRESH) {
+		throw new Error('Must provide OAuth 2.0 credentials to use Google Drive API!');
+	}
+	var OAuth2 = google.auth.OAuth2;
+	var oauth2Client = new OAuth2(args.google_client_id, args.google_client_secret, 'http://localhost');
+	oauth2Client.setCredentials({
+		access_token: G_ACCESS,
+		refresh_token: G_REFRESH
+	});
+	var drive = google.drive({version: 'v2', auth: oauth2Client});
+	//file = drive.files.get({'fileId': guide}, function(error, reponse){
+		console.log(response);
+	//});
+}
+
+function write_collected_list_of_quotes(guide, filesdir) 
+{
+	guide = fs.existsSync(guide) ? guide : get_html_from_google_drive(guide);
 	files = get_files_paths_from_dir(filesdir); 
 	generate_categories = generate_categories.bind({'files_to_highlight': files});	
 	run_in_dom(guide, generate_categories);
 }
 
 var args = parser.parseArgs();
+var G_ID = args.google_client_id ? args.google_client_id : process.env.GOOGLE_CLIENT_ID;
+var G_SECRET = args.google_client_secret ? args.google_client_secret : process.env.GOOGLE_CLIENT_SECRET;
+var G_ACCESS = args.google_client_access ? args.google_client_access : process.env.GOOGLE_ACCESS_TOKEN;
+var G_REFRESH = args.google_client_refresh ? args.google_client.refresh : process.env.GOOGLE_REFRESH_TOKEN;
+
 write_collected_list_of_quotes(args.guide, args.directory);
