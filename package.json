@@ -1,0 +1,38 @@
+{
+  "name": "qcc",
+  "version": "0.0.1",
+  "description": "Qualitative coding collector: a qualitative data analysis tool",
+  "main": "qcc.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vdloo/qcc.js.git"
+  },
+  "dependencies": {
+	  "jsdom": "latest",
+	  "argparse": "latest"
+  },
+  "keywords": [
+    "qualitative",
+    "data",
+    "analysis",
+    "highlight",
+    "tags",
+    "categories",
+    "grounded",
+    "theory",
+    "social",
+    "research"
+  ],
+  "author": "Rick van de Loo <rickvandeloo@gmail.com>",
+  "license": "GPLv2",
+  "bugs": {
+    "url": "https://github.com/vdloo/qcc.js/issues"
+  },
+  "homepage": "https://github.com/vdloo/qcc.js"
+}
