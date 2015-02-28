@@ -1,6 +1,36 @@
+#!/usr/bin/env node
 var fs = require('fs');
 var path = require('path');
 var jsdom = require('jsdom');
+var argparse = require('argparse');
+var jquery = path.resolve('jquery.js');
+
+var parser = new argparse.ArgumentParser({
+	version: '0.0.1',
+	addHelp: true,
+	description: 'Qualitative coding collector: a qualitative data analysis tool'
+});
+parser.addArgument(
+	['-g', '--guide'],
+	{
+		help: 'HTML file with highlighted list of terms',
+		required: true
+	}
+);
+parser.addArgument(
+	['-d', '--directory'],
+	{
+		help: 'directory containing HTML files with highlighted text',
+		required: true
+	}
+);
+parser.addArgument(
+	['-o', '--output'],
+	{
+		help: 'output HTML file',
+		defaultValue: 'out.html'
+	}
+);
 var context = {};
 
 function djb2(str)
@@ -26,7 +56,9 @@ function create_html_from_category(category)
 function create_html_from_context()
 {
 	out = Object.keys(context).map(function(k) {
-		return '<h1 id=' + djb2(k) + '>' + k + '</h1>' + create_html_from_category(context[k])}
+		colorcode = Object.keys(categories).filter(function(c) {return categories[c] == k});
+		color_tag = ' <span style="font-size: 12px; background-color: ' + colorcode + '">' + colorcode + '</span>';
+		return '<h1 id=' + djb2(k) + '>' + k + color_tag + '</h1>' + create_html_from_category(context[k])}
 	);
 	return out.reduce(function(p, q) {return p + q}, '');
 }
@@ -45,20 +77,17 @@ function add_file_path_if_not_yet_in_category()
 function add_quote_if_not_yet_in_category()
 {
 	quoteblock = self.parent();
-	quote_html = quoteblock.html();
-	quote_identifier = djb2(quote_html);
+	quote_identifier = djb2(quoteblock.text());
+
 	highlighted = $('span[class^=c]', quoteblock);
 	highlighted.each(function(){
 		self = $(this);
 		colorcode = self.css('background-color');
-		if (cat = categories[colorcode]) {
-			if (cat != category) {
-				self.html(self.html().link('#' + djb2(cat)));
-			}
-		}
 	});
 
-	context[category][filepath][quote_identifier] = quote_html;
+	click_listener = '<script>document.getElementById(' + quote_identifier + ').addEventListener("click", function(){window.open("' + args.directory + '/' + filepath + '")});</script>';
+	quote_html = '<span id=' + quote_identifier + '>' + quoteblock.html() + '</span>';
+	context[category][filepath][quote_identifier] = quote_html + click_listener;
 }
 
 function add_category_if_not_yet_in_context()
@@ -133,7 +162,6 @@ function run_in_dom(file, func)
 function get_files_paths_from_dir(dir) {
 	files = fs.readdirSync(dir);
 	files = files.filter(function(path){return path != jquery}, files);
-	files = files.filter(function(path){return path != guidefile}, files);
 	return files.map(function(path){return dir + '/' + path}, files);
 }
 
@@ -151,9 +179,5 @@ function write_collected_list_of_quotes(guide, filesdir) {
 	run_in_dom(guide, generate_categories);
 }
 
-var jquery = 'jquery.js';
-filesdir = 'examples';
-guidefile = 'Example_highlight_guide.html'
-guide = filesdir + '/' + guidefile;
-
-write_collected_list_of_quotes(guide, filesdir);
+var args = parser.parseArgs();
+write_collected_list_of_quotes(args.guide, args.directory);
