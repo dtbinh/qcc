@@ -5,6 +5,8 @@ var argparse = require('argparse');
 var google = require('googleapis');
 var jsdom = require('jsdom');
 var jquery = 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js';
+var OAuth2 = google.auth.OAuth2;
+var oauth2Client;
 
 var parser = new argparse.ArgumentParser({
 	version: '0.0.1',
@@ -172,19 +174,23 @@ function generate_categories()
 	this.files_to_highlight.map(function(file){run_in_dom(file, collect_highlighted)});
 }
 
-function get_html_url_from_google_drive(guide, callback) 
+function set_up_google_api_oauth()
 {
 	if (!G_ID || !G_SECRET || !G_ACCESS || !G_REFRESH) {
 		throw new Error('Must provide OAuth 2.0 credentials to use Google Drive API!');
 	}
 	var OAuth2 = google.auth.OAuth2;
-	var oauth2Client = new OAuth2(args.google_client_id, args.google_client_secret, 'http://localhost');
+	oauth2Client = new OAuth2(G_ID, G_SECRET, 'http://localhost');
 	oauth2Client.setCredentials({
 		access_token: G_ACCESS,
 		refresh_token: G_REFRESH
 	});
-	var drive = google.drive({version: 'v2', auth: oauth2Client});
+	oauth2Client.refreshAccessToken(function(){});
+}
 
+function get_html_url_from_google_drive(guide, callback) 
+{
+	var drive = google.drive({version: 'v2', auth: oauth2Client});
 	console.log('Getting HTML export URL from Google Drive API');
 	file = drive.files.get({'fileId': guide}, function(error, response){
 		if (error) {
@@ -230,7 +236,9 @@ function get_files_from_input(files_input)
 			files = fs.readdirSync(first_item);
 			return files.map(function(path){return first_item + path}, files);
 		} else {
-			return files = fs.readFileSync(files_input[0]).tosString().split('\n');
+			return fs.readFileSync(first_item).toString().split('\n').filter(function(x){
+				return x.length > 0
+			});;
 		}
 	} else {
 		return files = files_input;
@@ -260,5 +268,6 @@ var G_ID = args.google_client_id ? args.google_client_id : process.env.GOOGLE_CL
 var G_SECRET = args.google_client_secret ? args.google_client_secret : process.env.GOOGLE_CLIENT_SECRET;
 var G_ACCESS = args.google_client_access ? args.google_client_access : process.env.GOOGLE_ACCESS_TOKEN;
 var G_REFRESH = args.google_client_refresh ? args.google_client.refresh : process.env.GOOGLE_REFRESH_TOKEN;
+set_up_google_api_oauth();
 
 write_collected_list_of_quotes(args.guide, args.texts);
