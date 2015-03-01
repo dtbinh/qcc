@@ -12,7 +12,7 @@ var parser = new argparse.ArgumentParser({
 	version: '0.0.1',
 	addHelp: true,
 	description: 'Qualitative coding collector: a qualitative data analysis tool',
-	epilog: 'Example: ./qcc.js -g examples/guide.html -d examples/transcripts/'
+	epilog: 'Example: ./qcc.js -g examples/guide.html -t examples/transcripts/'
 });
 parser.addArgument(
 	['-g', '--guide'],
