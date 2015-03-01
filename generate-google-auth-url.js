@@ -32,10 +32,6 @@ parser.addArgument(
 		action: 'storeTrue'
 	}
 );
-var args = parser.parseArgs();
-
-var oauth2Client = new OAuth2(args.google_client_id, args.google_client_secret, 'http://localhost:6541');
-
 
 function getTokens(request)
 {
@@ -80,6 +76,8 @@ function getAuthUrl(oauth2Client)
 	});
 }
 
+var args = parser.parseArgs();
+var oauth2Client = new OAuth2(args.google_client_id, args.google_client_secret, 'http://localhost:6541');
 var url = getAuthUrl(oauth2Client);
 server.listen(6541);
 if (!args.silent) {
