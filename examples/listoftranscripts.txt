@@ -1,0 +1,2 @@
+examples/transcripts/highlighted_transcript_2.html
+examples/transcripts/highlighted_transcript_1.html

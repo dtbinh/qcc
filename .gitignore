@@ -2,4 +2,5 @@
 *.txt
 out.html
 node_modules
+!examples/listoftranscripts.txt
 files_to_highlight/*

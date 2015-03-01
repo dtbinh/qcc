@@ -59,8 +59,7 @@ $ `./generate-google-auth-url.js -i $GOOGLE_CLIENT_ID -s $GOOGLE_CLIENT_SECRET -
 ```
 
 With valid oauth credentials you can use Google Drive file ids. This is
-the string in the URL between https://docs.google.com/document/d/ and
-/edit.
+the string in the URL between /document/d/ and /edit.
 ```
 $ ./qcc.js -g 1OVcc__rOqlRCoJuUxYhazf21HsvajeVk5uYZyOazQ-c -t 11Z0ulAl2x0nVv1fYIPZoedSWGxUo9nSgHRw-wNodEkg -t 1T-38buld61SdRvU8bZWd1mysvrhKG-kVRZCrsjv_3gE
 
