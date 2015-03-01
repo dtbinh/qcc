@@ -71,15 +71,15 @@ function djb2(str)
 	}, out);
 }
 
-function create_html_from_filepaths(filepath)
+function create_html_from_filetitles(filetitle)
 {
-	var out = Object.keys(filepath).map(function(k) {return filepath[k] + '<br><br>'});
+	var out = Object.keys(filetitle).map(function(k) {return filetitle[k] + '<br><br>'});
 	return out.reduce(function(p, q) {return p + q}, '');
 }
 
 function create_html_from_category(category)
 {
-	var out = Object.keys(category).map(function(k) {return '<h2>' + k + '</h2>' + create_html_from_filepaths(category[k])});
+	var out = Object.keys(category).map(function(k) {return '<h2>' + k + '</h2>' + create_html_from_filetitles(category[k])});
 	return out.reduce(function(p, q) {return p + q}, '');
 }
 
@@ -99,8 +99,8 @@ function set_inline_background_color() {
 
 function add_file_path_if_not_yet_in_category()
 {
-	if (typeof(context[category][filepath]) == 'undefined') {
-		context[category][filepath] = {};
+	if (typeof(context[category][filetitle]) == 'undefined') {
+		context[category][filetitle] = {};
 	}
 }
 
@@ -115,9 +115,9 @@ function add_quote_if_not_yet_in_category()
 		colorcode = self.css('background-color');
 	});
 
-	click_listener = '<script>document.getElementById(' + quote_identifier + ').addEventListener("click", function(){window.open("' + args.texts + '/' + filepath + '")});</script>';
+	click_listener = '<script>document.getElementById(' + quote_identifier + ').addEventListener("click", function(){window.open("' + args.texts + '/' + filetitle + '")});</script>';
 	quote_html = '<span id=' + quote_identifier + '>' + quoteblock.html() + '</span>';
-	context[category][filepath][quote_identifier] = quote_html + click_listener;
+	context[category][filetitle][quote_identifier] = quote_html + click_listener;
 }
 
 function add_category_if_not_yet_in_context()
@@ -207,13 +207,14 @@ function run_in_dom(file, func)
 	_jsdom_wrapper = function(file){
 		func = func || function(){};
 		func_wrapper = function(errors, window) {
-			filepath = path.basename(window.location._url.path);
+			filetitle = window.document.title;
 			console.log('Loading jQuery into ' + file);
 			$ = window.jQuery;
 			func()
 		}
 		scripts = (typeof(scripts) === 'undefined') ? 'jquery.js' : scripts;
 		console.log('Creating DOM from ' + file);
+		
 		config = {
 			scripts: jquery,
 			done: func_wrapper
