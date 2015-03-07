@@ -18,6 +18,16 @@ document so you don't have to pore over your source material every time
 you ask yourself 'which of my interviewees said something related to this
 topic?'
 
+## Install
+
+```
+git clone https://github.com/vdloo/qcc.git
+cd qcc
+npm install
+```
+
+Note that this program uses the latest version of jsdom which requires io.js instead of Node.js.
+
 ## Examples
 
 Generate out.html by using the provided example guide and transcriptions.
