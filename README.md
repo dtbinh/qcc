@@ -42,13 +42,7 @@ $ ./qcc.js -g examples/guide.html -t examples/transcripts/highlighted_transcript
 
 ```
 
-Same thing goes for file containing a path to a file on each line.
-```
-$ ./qcc.js -g examples/guide.html -t examples/listoftranscripts.txt
-
-```
-
-Same thing goes for file containing a path to a file on each line.
+Same thing goes for a file containing paths to files.
 ```
 $ ./qcc.js -g examples/guide.html -t examples/listoftranscripts.txt
 
